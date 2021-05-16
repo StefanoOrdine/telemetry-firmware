@@ -9,9 +9,8 @@ from SI7006A20 import SI7006A20
 from LTR329ALS01 import LTR329ALS01
 from LIS2HH12 import LIS2HH12
 
-# White: Main execution started
-pycom.rgbled(0x070707)
-
+# Fuchsia: Reading sensors
+pycom.rgbled(0x330033)
 py = Pysense()
 
 mp = MPL3115A2(py, mode=ALTITUDE)
@@ -58,9 +57,9 @@ print("Pitch: " + str(pitch))
 print("\nFiPy")
 print("Battery voltage: " + str(battery_voltage))
 
-# Fuchsia: Networking
+# Blue: Networking
+pycom.rgbled(0x000022)
 pybytes.connect()
-pycom.rgbled(0x330033)
 tup = ( \
     temperature, \
     altitude, \
@@ -76,16 +75,16 @@ tup = ( \
 )
 pybytes.send_signal(1, tup)
 
-# Greenwater: Wait the signals to be all pushed
-pycom.rgbled(0x003333)
+# Greenwater: Delay to safely push all data
+pycom.rgbled(0x002222)
 time.sleep(15)
 pybytes.disconnect()
 
-# Green: Execution finished
-pycom.rgbled(0x003300)
+# Green: Execution finished successfully
+pycom.rgbled(0x002200)
 time.sleep(2)
 
-# Off: Sleep for 5 minutes
+# Off: Sleep for 1 hour
 pycom.rgbled(0x000000)
-time_milliseconds = 5 * 60 * 1000
+time_milliseconds = 60 * 60 * 1000
 pybytes.deepsleep(time_milliseconds)
