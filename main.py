@@ -8,6 +8,7 @@ from MPL3115A2 import MPL3115A2,ALTITUDE,PRESSURE
 from SI7006A20 import SI7006A20
 from LTR329ALS01 import LTR329ALS01
 from LIS2HH12 import LIS2HH12
+from utils import safely_read_light_sensor, print_sensors
 
 # Fuchsia: Reading sensors
 pycom.rgbled(0x330033)
@@ -27,9 +28,8 @@ t_ambient = 24.4
 humid_ambient = si.humid_ambient(t_ambient)
 
 lt = LTR329ALS01(py)
-light = lt.light()
-[light_blue, light_red] = light
-lux = lt.lux()
+(lux, light) = safely_read_light_sensor(lt)
+(light_blue, light_red) = light
 
 li = LIS2HH12(py)
 acceleration = li.acceleration()
@@ -39,23 +39,7 @@ pitch = li.pitch()
 
 battery_voltage = py.read_battery_voltage()
 
-print("\nMPL3115A2")
-print("Temperature: " + str(temperature))
-print("Altitude: " + str(altitude))
-print("Pressure: " + str(pressure))
-print("\nSI7006A20")
-print("Temperature: " + str(si_temperature)+ " deg C and Relative Humidity: " + str(humidity) + " %RH")
-print("Dew point: "+ str(dew_point) + " deg C")
-print("Humidity Ambient for " + str(t_ambient) + " deg C is " + str(humid_ambient) + "%RH")
-print("\nLTR329ALS01")
-print("Light (channel Blue lux, channel Red lux): " + str(light))
-print("Lux: " + str(lux))
-print("\nLIS2HH12")
-print("Acceleration: " + str(acceleration))
-print("Roll: " + str(roll))
-print("Pitch: " + str(pitch))
-print("\nFiPy")
-print("Battery voltage: " + str(battery_voltage))
+print_sensors(temperature, altitude, pressure, si_temperature, humidity, dew_point, t_ambient, humid_ambient, light, lux, acceleration, roll, pitch, battery_voltage)
 
 # Blue: Networking
 pycom.rgbled(0x000022)
@@ -77,7 +61,7 @@ pybytes.send_signal(1, tup)
 
 # Greenwater: Delay to safely push all data
 pycom.rgbled(0x002222)
-time.sleep(15)
+time.sleep(5)
 pybytes.disconnect()
 
 # Green: Execution finished successfully
